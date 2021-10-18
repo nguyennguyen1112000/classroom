@@ -8,7 +8,7 @@
   "scripts": {
     "postinstall": "npm run build",
     "prebuild": "rimraf dist",
-    "build": "nest build",
+    "build": "nest build -p $PORT",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
