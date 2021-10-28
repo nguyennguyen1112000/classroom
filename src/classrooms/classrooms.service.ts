@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
@@ -33,15 +37,38 @@ export class ClassroomsService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} classroom`;
+  async findOne(id: number, userId: number) {
+    try {
+      return await this.classroomsRepository.findOne({
+        where: { id: id, created_by: { id: userId } },
+      });
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
 
-  update(id: number, updateClassroomDto: UpdateClassroomDto) {
-    return `This action updates a #${id} classroom`;
+  async update(id: number, updateClassroomDto: UpdateClassroomDto) {
+    try {
+      const classRoom = await this.classroomsRepository.findOne(id);
+      if (!classRoom)
+        throw new NotFoundException(`Classroom not found. Id = ${id}`);
+      const { name, topic } = updateClassroomDto;
+      classRoom.name = name;
+      classRoom.topic = topic;
+      return await this.classroomsRepository.save(classRoom);
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} classroom`;
+  async remove(id: number) {
+    try {
+      const classRoom = await this.classroomsRepository.findOne(id);
+      if (!classRoom)
+        throw new NotFoundException(`Classroom not found. Id = ${id}`);
+      return await this.classroomsRepository.remove(classRoom);
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
 }

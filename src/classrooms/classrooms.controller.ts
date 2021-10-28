@@ -22,13 +22,15 @@ export class ClassroomsController {
   }
 
   @Get()
-  findAll(@GetUser() user:User) {
+  findAll(@GetUser() user: User) {
     return this.classroomsService.findAll(user.id);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.classroomsService.findOne(+id);
+  findOne(@Param('id') id: string, @GetUser() user: User) {
+    console.log(user);
+
+    return this.classroomsService.findOne(+id, user.id);
   }
 
   @Patch(':id')

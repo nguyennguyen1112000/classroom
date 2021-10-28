@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   ManyToOne,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -26,4 +27,10 @@ export class Classroom {
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
   public created_at: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+  public updated_at: Date;
 }
