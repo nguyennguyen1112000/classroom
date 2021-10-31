@@ -5,7 +5,9 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
+import { UserRole } from '../decorator/user.enum';
 
 @Entity()
 export class User {
@@ -24,6 +26,9 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.STUDENT })
+  role: UserRole;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
@@ -32,4 +37,7 @@ export class User {
 
   @OneToMany(() => Classroom, (classroom) => classroom.created_by)
   classrooms: Classroom[];
+
+  @ManyToMany((type) => Classroom, (classroom) => classroom.students)
+  joinedClasses: Classroom[];
 }

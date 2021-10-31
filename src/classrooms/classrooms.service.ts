@@ -19,11 +19,13 @@ export class ClassroomsService {
   ) {}
   async create(createClassroomDto: CreateClassroomDto, user: any) {
     try {
-      const { name, topic } = createClassroomDto;
+      const { name, topic, description } = createClassroomDto;
       const created_by = await this.usersService.findById(user.id);
       let classroom = new Classroom();
       classroom.name = name;
       classroom.topic = topic;
+      classroom.description = description;
+      classroom.code = (Math.random() + 1).toString(36).substring(7);
       classroom.created_by = created_by;
       return await this.classroomsRepository.save(classroom);
     } catch (err) {
@@ -42,6 +44,22 @@ export class ClassroomsService {
       return await this.classroomsRepository.findOne({
         where: { id: id, created_by: { id: userId } },
       });
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async findAllStudents(id: number) {
+    try {
+      const classroom = await this.classroomsRepository.findOne({
+        where: { id: id },
+        relations: ['students'],
+      });
+      const { students } = classroom;
+      return {
+        students: students,
+        numOfStudents: students.length,
+      };
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -67,6 +85,25 @@ export class ClassroomsService {
       if (!classRoom)
         throw new NotFoundException(`Classroom not found. Id = ${id}`);
       return await this.classroomsRepository.remove(classRoom);
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+  async addStudent(code: string, studentId: number) {
+    try {
+      const classroom = await this.classroomsRepository.findOne({
+        where: { code: code },
+      });
+      if (classroom) {
+        const student = await this.usersService.findById(studentId);
+        if (!student)
+          throw new BadRequestException(
+            `Student Id is not valid. Id =${studentId}`,
+          );
+        classroom.students = [...classroom.students, student];
+        await this.classroomsRepository.save(classroom);
+        return true;
+      }
     } catch (err) {
       throw new BadRequestException(err.message);
     }

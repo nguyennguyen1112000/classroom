@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ClassroomsService } from './classrooms.service';
 import { CreateClassroomDto } from './dto/create-classroom.dto';
@@ -20,29 +19,33 @@ export class ClassroomsController {
   ) {
     return this.classroomsService.create(createClassroomDto, user);
   }
-
+  
   @Get()
   findAll(@GetUser() user: User) {
     return this.classroomsService.findAll(user.id);
   }
+  @Get("/:id/students")
+  findAllStudents(@Param("id") id:number) {
+    return this.classroomsService.findAllStudents(id);
+  }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @GetUser() user: User) {
+  findOne(@Param('id') id: number, @GetUser() user: User) {
     console.log(user);
 
-    return this.classroomsService.findOne(+id, user.id);
+    return this.classroomsService.findOne(id, user.id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateClassroomDto: UpdateClassroomDto,
   ) {
-    return this.classroomsService.update(+id, updateClassroomDto);
+    return this.classroomsService.update(id, updateClassroomDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.classroomsService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.classroomsService.remove(id);
   }
 }

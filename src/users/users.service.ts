@@ -13,7 +13,7 @@ export class UsersService {
   ) {}
   async create(createUserDto: CreateUserDto) {
     try {
-      const { email, firstName, lastName, password } = createUserDto;
+      const { email, firstName, lastName, password, role } = createUserDto;
       const account = await this.usersRepository.findOne({
         where: { email: email },
       });
@@ -25,6 +25,7 @@ export class UsersService {
       user.firstName = firstName;
       user.lastName = lastName;
       user.password = hash;
+      user.role = role;
       return await this.usersRepository.save(user);
     } catch (err) {
       throw new BadRequestException(err.message);

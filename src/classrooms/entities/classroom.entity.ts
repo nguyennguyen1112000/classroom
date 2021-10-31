@@ -6,6 +6,8 @@ import {
   CreateDateColumn,
   ManyToOne,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 @Entity()
@@ -18,6 +20,12 @@ export class Classroom {
 
   @Column()
   topic: string;
+
+  @Column({ nullable: true })
+  description: string;
+
+  @Column()
+  code: string;
 
   @ManyToOne(() => User, (user) => user.classrooms)
   created_by: User;
@@ -33,4 +41,8 @@ export class Classroom {
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
   public updated_at: Date;
+
+  @ManyToMany((type) => User, (user) => user.joinedClasses)
+  @JoinTable()
+  students: User[];
 }
