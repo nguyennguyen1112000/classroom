@@ -20,8 +20,10 @@ export class MailService {
       subject: `Mời tham gia lớp học ${classroomName} `,
       template: './welcome', 
       context: {
-        name: "Nguyen",
-        url:classUrl,
+        fromUser,
+        classUrl,
+        classroomName,
+        role
       },
     });
     console.log(sendMail);
