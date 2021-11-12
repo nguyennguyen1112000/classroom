@@ -3,11 +3,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { ClassroomsModule } from './classrooms/classrooms.module';
+import { GoogleModule } from './google/google.module';
+import { UserToClassModule } from './user-to-class/user-to-class.module';
+import { MailModule } from './mail/mail.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
     ClassroomsModule,
-    AuthModule
+    AuthModule,
+    GoogleModule,
+    UserToClassModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [],

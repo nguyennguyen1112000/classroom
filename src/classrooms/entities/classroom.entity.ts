@@ -1,3 +1,4 @@
+import { UserToClass } from 'src/user-to-class/entities/user-to-class.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
@@ -6,8 +7,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   UpdateDateColumn,
-  ManyToMany,
-  JoinTable,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -42,7 +42,9 @@ export class Classroom {
   })
   public updated_at: Date;
 
-  @ManyToMany((type) => User, (user) => user.joinedClasses)
-  @JoinTable()
-  students: User[];
+  @OneToMany(
+    (type) => UserToClass,
+    (userToClass) => userToClass.classroom,
+  )
+  public userToClasses: UserToClass[];
 }

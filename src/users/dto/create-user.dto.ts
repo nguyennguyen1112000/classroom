@@ -1,6 +1,4 @@
-import { Query } from "@nestjs/common";
-import { ApiProperty, ApiQuery } from "@nestjs/swagger";
-import { UserRole } from "../decorator/user.enum";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateUserDto {
   @ApiProperty()
@@ -12,9 +10,9 @@ export class CreateUserDto {
   @ApiProperty({ default: '' })
   lastName: string;
 
+  @ApiProperty({ nullable:true })
+  googleId: string;
+
   @ApiProperty()
   password: string;
-
-  @ApiProperty({ enum: ['Admin', 'Teacher', 'Student'] })
-  role: UserRole;
 }

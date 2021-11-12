@@ -2,7 +2,7 @@
   "type": "mysql",
   "host": "localhost",
   "port": 3306,
-  "username": "classroom",
+  "username": "root",
   "password": "123456",
   "database": "classroom",
   "entities": ["dist/**/*.entity{.ts,.js}"],

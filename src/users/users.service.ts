@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -13,19 +13,26 @@ export class UsersService {
   ) {}
   async create(createUserDto: CreateUserDto) {
     try {
-      const { email, firstName, lastName, password, role } = createUserDto;
+      const { email, firstName, lastName, password, googleId } =
+        createUserDto;
       const account = await this.usersRepository.findOne({
         where: { email: email },
       });
-      if (account) throw new BadRequestException('Email already in use.');
-      const saltOrRounds = 10;
-      const hash = await bcrypt.hash(password, saltOrRounds);
+      if (account)
+        throw new BadRequestException('Tài khoản email đã được sử dụng');
       let user = new User();
+
+      if (password) {     
+        const saltOrRounds = 10;
+        const hash = await bcrypt.hash(password, saltOrRounds);
+        user.password = hash;
+      } else if (googleId) {
+        user.googleId = googleId;
+      }
+
       user.email = email;
       user.firstName = firstName;
       user.lastName = lastName;
-      user.password = hash;
-      user.role = role;
       return await this.usersRepository.save(user);
     } catch (err) {
       throw new BadRequestException(err.message);
@@ -42,8 +49,16 @@ export class UsersService {
   async findById(id: number) {
     return await this.usersRepository.findOne(id);
   }
+  async findByGoogleId(id: string) {
+    return await this.usersRepository.findOne({ where: { googleId: id } });
+  }
   async update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    const user = await this.findById(id);
+    if(!user) throw new NotFoundException(`User not found. Id = ${id}`);
+    const {firstName, lastName} = updateUserDto;
+    user.firstName = firstName;
+    user.lastName = lastName;
+    return await this.usersRepository.save(user);
   }
 
   remove(id: number) {

@@ -39,31 +39,42 @@ export class ClassroomsService {
     });
   }
 
-  async findOne(id: number, userId: number) {
+  async findOne(id: number) {
     try {
-      return await this.classroomsRepository.findOne({
-        where: { id: id, created_by: { id: userId } },
-      });
+      return await this.classroomsRepository.findOne(id);
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
 
-  async findAllStudents(id: number) {
+  async findByCode(code: string) {
     try {
-      const classroom = await this.classroomsRepository.findOne({
-        where: { id: id },
-        relations: ['students'],
-      });
-      const { students } = classroom;
-      return {
-        students: students,
-        numOfStudents: students.length,
-      };
+      
+      const classroom = await this.classroomsRepository.findOne({ relations:['created_by'],
+        where: { code: code},
+      });     
+      if(!classroom) throw new NotFoundException();
+      return classroom;
     } catch (err) {
       throw new BadRequestException(err.message);
     }
   }
+
+  // async findAllStudents(id: number) {
+  //   try {
+  //     const classroom = await this.classroomsRepository.findOne({
+  //       where: { id: id },
+  //       relations: ['students'],
+  //     });
+  //     const { students } = classroom;
+  //     return {
+  //       students: students,
+  //       numOfStudents: students.length,
+  //     };
+  //   } catch (err) {
+  //     throw new BadRequestException(err.message);
+  //   }
+  // }
 
   async update(id: number, updateClassroomDto: UpdateClassroomDto) {
     try {
@@ -89,23 +100,23 @@ export class ClassroomsService {
       throw new BadRequestException(err.message);
     }
   }
-  async addStudent(code: string, studentId: number) {
-    try {
-      const classroom = await this.classroomsRepository.findOne({
-        where: { code: code },
-      });
-      if (classroom) {
-        const student = await this.usersService.findById(studentId);
-        if (!student)
-          throw new BadRequestException(
-            `Student Id is not valid. Id =${studentId}`,
-          );
-        classroom.students = [...classroom.students, student];
-        await this.classroomsRepository.save(classroom);
-        return true;
-      }
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
-  }
+  // async addStudent(code: string, studentId: number) {
+  //   try {
+  //     const classroom = await this.classroomsRepository.findOne({
+  //       where: { code: code },
+  //     });
+  //     if (classroom) {
+  //       const student = await this.usersService.findById(studentId);
+  //       if (!student)
+  //         throw new BadRequestException(
+  //           `Student Id is not valid. Id =${studentId}`,
+  //         );
+  //       classroom.students = [...classroom.students, student];
+  //       await this.classroomsRepository.save(classroom);
+  //       return true;
+  //     }
+  //   } catch (err) {
+  //     throw new BadRequestException(err.message);
+  //   }
+  // }
 }
