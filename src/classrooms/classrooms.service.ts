@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { CreateClassroomDto } from './dto/create-classroom.dto';
@@ -41,7 +42,18 @@ export class ClassroomsService {
 
   async findOne(id: number) {
     try {
-      return await this.classroomsRepository.findOne(id);
+      const classroom = await this.classroomsRepository.findOne({
+        relations: ['userToClasses', 'userToClasses.user'],
+        where: { id: id },
+      });
+      const users = await classroom.userToClasses.map((obj) => ({
+        role: obj.role,
+        user: obj.user,
+      }));
+      const teachers = users.filter((user) => user.role == 'teacher');
+      const students = users.filter((user) => user.role == 'student');
+
+      return { ...classroom, teachers, students, userToClasses: undefined };
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -49,12 +61,19 @@ export class ClassroomsService {
 
   async findByCode(code: string) {
     try {
-      
-      const classroom = await this.classroomsRepository.findOne({ relations:['created_by'],
-        where: { code: code},
-      });     
-      if(!classroom) throw new NotFoundException();
-      return classroom;
+      const classroom = await this.classroomsRepository.findOne({
+        relations: ['created_by', 'userToClasses', 'userToClasses.user'],
+        where: { code: code },
+      });
+      if (!classroom) throw new NotFoundException();
+      const users = await classroom.userToClasses.map((obj) => ({
+        role: obj.role,
+        user: obj.user,
+      }));
+      const teachers = users.filter((user) => user.role == 'teacher');
+      const students = users.filter((user) => user.role == 'student');
+
+      return { ...classroom, teachers, students, userToClasses: undefined };
     } catch (err) {
       throw new BadRequestException(err.message);
     }

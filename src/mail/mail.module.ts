@@ -1,28 +1,34 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { MailService } from './mail.service';
 import { join } from 'path';
-import { ClassroomsModule } from 'src/classrooms/classrooms.module';
-
+import { ConfigService } from '@nestjs/config';
+@Global()
 @Module({
   imports: [
-    MailerModule.forRoot({
-      transport: {
-        service: 'gmail',
-        host: 'smtp.gmail.com',
-        auth: {
-          user: 'onl.class123@gmail.com',
-          pass: 'jqicgtcleeweworp',
+    MailerModule.forRootAsync({
+      useFactory: async (config: ConfigService) => ({
+        transport: {
+          service: config.get('MAIL_SERVICE'),
+          host: config.get('MAIL_HOST'),
+          auth: {
+            user: config.get('MAIL_USER'),
+            pass: config.get('MAIL_PASSWORD'),
+          },
+          tls: {
+            rejectUnauthorized: false,
+          },
         },
-      },
-      template: {
-        dir: join(__dirname, 'templates'),
-        adapter: new HandlebarsAdapter(), // or new PugAdapter() or new EjsAdapter()
-        options: {
-          strict: true,
+        template: {
+          dir: join(__dirname, 'templates'),
+          adapter: new HandlebarsAdapter(), 
+          options: {
+            strict: true,
+          },
         },
-      },
+      }),
+      inject: [ConfigService],
     }),
   ],
   providers: [MailService],

@@ -26,6 +26,5 @@ export class MailService {
         role
       },
     });
-    console.log(sendMail);
   }
 }

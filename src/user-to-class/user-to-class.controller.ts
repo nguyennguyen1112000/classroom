@@ -23,7 +23,7 @@ export class UserToClassController {
   constructor(private readonly userToClassService: UserToClassService) {}
 
   @Post()
-  create(@Body() createUserToClassDto: CreateUserToClassDto) {
+  create(@Body() createUserToClassDto: CreateUserToClassDto) {   
     return this.userToClassService.create(createUserToClassDto);
   }
 

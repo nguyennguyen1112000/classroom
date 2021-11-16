@@ -9,6 +9,6 @@ import { ClassroomsModule } from 'src/classrooms/classrooms.module';
 @Module({
   imports: [TypeOrmModule.forFeature([UserToClass]), UsersModule, ClassroomsModule],
   controllers: [UserToClassController],
-  providers: [UserToClassService]
+  providers: [UserToClassService],
 })
 export class UserToClassModule {}
