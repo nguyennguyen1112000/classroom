@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -16,20 +15,17 @@ import { CreateClassroomDto } from './dto/create-classroom.dto';
 import { UpdateClassroomDto } from './dto/update-classroom.dto';
 import { GetUser } from '../users/decorator/user.decorator';
 import { User } from 'src/users/entities/user.entity';
-import { MailService } from 'src/mail/mail.service';
 import { SendInviterEmailDto } from './dto/send-invite-email.dto';
 import { UserRole } from 'src/users/decorator/user.enum';
-import { UsersService } from 'src/users/users.service';
+import { Roles } from 'src/user-to-class/decorator/roles.decorator';
+import { RolesGuard } from 'src/user-to-class/decorator/roles.guard';
+
 @ApiTags('classrooms')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('JWT-auth')
 @Controller('classrooms')
 export class ClassroomsController {
-  constructor(
-    private readonly classroomsService: ClassroomsService,
-    private readonly mailService: MailService,
-    private readonly usersService: UsersService
-  ) {}
+  constructor(private readonly classroomsService: ClassroomsService) {}
   @Post()
   create(
     @Body() createClassroomDto: CreateClassroomDto,
@@ -37,47 +33,34 @@ export class ClassroomsController {
   ) {
     return this.classroomsService.create(createClassroomDto, user);
   }
-  @Post('invite')
+  @Post('invite/:id')
+  @Roles(UserRole.TEACHER)
   async inviteUser(
+    @Param('id') id: number,
     @Body() sendInviteEmailDto: SendInviterEmailDto,
     @GetUser() user: User,
   ) {
-    const { email, classroomId, role } = sendInviteEmailDto;
-    const classroom = await this.classroomsService.findOne(classroomId);
-    const classUrl = `${process.env.WEBBASE_URL}/classrooms/${Buffer.from(
-      classroom.code,
-    ).toString('base64')}?role=${
-      role == UserRole.STUDENT ? 'student' : 'teacher'
-    }`;
-    const currentUser = await this.usersService.findById(user.id);    
-    return this.mailService.sendMailInvitation(
-      `${currentUser.firstName} ${currentUser.lastName}`,
-      email,
-      classroom.name,
-      classUrl,
-      role == UserRole.STUDENT ? 'sinh viên' : 'giảng viên',
-    );
+    await this.classroomsService.inviteUser(sendInviteEmailDto, user.id, id);
   }
 
   @Get()
   findAll(@GetUser() user: User) {
     return this.classroomsService.findAll(user.id);
   }
-  // @Get("/:id/students")
-  // findAllStudents(@Param("id") id:number) {
-  //   return this.classroomsService.findAllStudents(id);
-  // }
 
   @Get(':id')
+  @Roles(UserRole.TEACHER, UserRole.STUDENT)
   findOne(@Param('id') id: number) {
     return this.classroomsService.findOne(id);
   }
   @Get('/code/:id')
+  @Roles(UserRole.TEACHER, UserRole.STUDENT)
   findByCode(@Param('id') id: string) {
     return this.classroomsService.findByCode(id);
   }
 
   @Patch(':id')
+  @Roles(UserRole.TEACHER)
   update(
     @Param('id') id: number,
     @Body() updateClassroomDto: UpdateClassroomDto,
@@ -85,6 +68,7 @@ export class ClassroomsController {
     return this.classroomsService.update(id, updateClassroomDto);
   }
 
+  @Roles(UserRole.TEACHER)
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.classroomsService.remove(id);

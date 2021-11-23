@@ -4,11 +4,11 @@ import { UserToClassController } from './user-to-class.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserToClass } from './entities/user-to-class.entity';
 import { UsersModule } from 'src/users/users.module';
-import { ClassroomsModule } from 'src/classrooms/classrooms.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserToClass]), UsersModule, ClassroomsModule],
+  imports: [TypeOrmModule.forFeature([UserToClass]), UsersModule],
   controllers: [UserToClassController],
   providers: [UserToClassService],
+  exports: [UserToClassService],
 })
 export class UserToClassModule {}

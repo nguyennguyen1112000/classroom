@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { UserToClassService } from './user-to-class.service';
 import { CreateUserToClassDto } from './dto/create-user-to-class.dto';
@@ -14,6 +15,7 @@ import { UpdateUserToClassDto } from './dto/update-user-to-class.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UserRole } from 'src/users/decorator/user.enum';
+import { Roles } from './decorator/roles.decorator';
 
 @ApiTags('user-classroom')
 @UseGuards(JwtAuthGuard)
@@ -23,7 +25,7 @@ export class UserToClassController {
   constructor(private readonly userToClassService: UserToClassService) {}
 
   @Post()
-  create(@Body() createUserToClassDto: CreateUserToClassDto) {   
+  create(@Body() createUserToClassDto: CreateUserToClassDto) {
     return this.userToClassService.create(createUserToClassDto);
   }
 
@@ -46,6 +48,10 @@ export class UserToClassController {
     @Body() updateUserToClassDto: UpdateUserToClassDto,
   ) {
     return this.userToClassService.update(+id, updateUserToClassDto);
+  }
+  @Put('mapStudentId')
+  mapStudentId(@Body() updateUserToClassDto: UpdateUserToClassDto) {
+    return this.userToClassService.mapStudentId(updateUserToClassDto);
   }
 
   @Delete(':id')

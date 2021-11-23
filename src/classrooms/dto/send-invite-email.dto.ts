@@ -7,10 +7,6 @@ export class SendInviterEmailDto {
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  classroomId: number;
-
   @ApiProperty({ enum: ['teacher', 'student'] })
   role: UserRole;
 }

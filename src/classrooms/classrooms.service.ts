@@ -1,13 +1,18 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { MailService } from 'src/mail/mail.service';
+import { UserToClassService } from 'src/user-to-class/user-to-class.service';
+import { UserRole } from 'src/users/decorator/user.enum';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { CreateClassroomDto } from './dto/create-classroom.dto';
+import { SendInviterEmailDto } from './dto/send-invite-email.dto';
 import { UpdateClassroomDto } from './dto/update-classroom.dto';
 import { Classroom } from './entities/classroom.entity';
 
@@ -17,6 +22,8 @@ export class ClassroomsService {
     @InjectRepository(Classroom)
     private classroomsRepository: Repository<Classroom>,
     private usersService: UsersService,
+    private readonly mailService: MailService,
+    private userToClassService: UserToClassService,
   ) {}
   async create(createClassroomDto: CreateClassroomDto, user: any) {
     try {
@@ -43,7 +50,7 @@ export class ClassroomsService {
   async findOne(id: number) {
     try {
       const classroom = await this.classroomsRepository.findOne({
-        relations: ['userToClasses', 'userToClasses.user'],
+        relations: ['created_by', 'userToClasses', 'userToClasses.user'],
         where: { id: id },
       });
       const users = await classroom.userToClasses.map((obj) => ({
@@ -69,6 +76,7 @@ export class ClassroomsService {
       const users = await classroom.userToClasses.map((obj) => ({
         role: obj.role,
         user: obj.user,
+        studentId: obj.studentId,
       }));
       const teachers = users.filter((user) => user.role == 'teacher');
       const students = users.filter((user) => user.role == 'student');
@@ -79,21 +87,7 @@ export class ClassroomsService {
     }
   }
 
-  // async findAllStudents(id: number) {
-  //   try {
-  //     const classroom = await this.classroomsRepository.findOne({
-  //       where: { id: id },
-  //       relations: ['students'],
-  //     });
-  //     const { students } = classroom;
-  //     return {
-  //       students: students,
-  //       numOfStudents: students.length,
-  //     };
-  //   } catch (err) {
-  //     throw new BadRequestException(err.message);
-  //   }
-  // }
+
 
   async update(id: number, updateClassroomDto: UpdateClassroomDto) {
     try {
@@ -119,23 +113,22 @@ export class ClassroomsService {
       throw new BadRequestException(err.message);
     }
   }
-  // async addStudent(code: string, studentId: number) {
-  //   try {
-  //     const classroom = await this.classroomsRepository.findOne({
-  //       where: { code: code },
-  //     });
-  //     if (classroom) {
-  //       const student = await this.usersService.findById(studentId);
-  //       if (!student)
-  //         throw new BadRequestException(
-  //           `Student Id is not valid. Id =${studentId}`,
-  //         );
-  //       classroom.students = [...classroom.students, student];
-  //       await this.classroomsRepository.save(classroom);
-  //       return true;
-  //     }
-  //   } catch (err) {
-  //     throw new BadRequestException(err.message);
-  //   }
-  // }
+  
+  async inviteUser(sendInviteEmailDto: SendInviterEmailDto, userId: number, classroomId: number) {
+    const { email, role } = sendInviteEmailDto;
+    const classroom = await this.findOne(classroomId);
+    const classUrl = `${process.env.WEBBASE_URL}/classrooms/${Buffer.from(
+      classroom.code,
+    ).toString('base64')}?role=${
+      role == UserRole.STUDENT ? 'student' : 'teacher'
+    }`;
+    const currentUser = await this.usersService.findById(userId);
+    return this.mailService.sendMailInvitation(
+      `${currentUser.firstName} ${currentUser.lastName}`,
+      email,
+      classroom.name,
+      classUrl,
+      role == UserRole.STUDENT ? 'sinh viên' : 'giảng viên',
+    );
+  }
 }
