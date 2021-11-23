@@ -16,6 +16,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UserRole } from 'src/users/decorator/user.enum';
 import { Roles } from './decorator/roles.decorator';
+import { GetUser } from 'src/users/decorator/user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @ApiTags('user-classroom')
 @UseGuards(JwtAuthGuard)
@@ -35,6 +37,10 @@ export class UserToClassController {
     @Param('role') role: UserRole,
   ) {
     return this.userToClassService.findAllByRole(classroomId, role);
+  }
+  @Get("/user")
+  findAllByUser(@GetUser() user: User) {
+    return this.userToClassService.findAllByUser(user.id);
   }
 
   @Get(':id')

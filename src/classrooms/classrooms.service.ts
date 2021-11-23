@@ -87,8 +87,6 @@ export class ClassroomsService {
     }
   }
 
-
-
   async update(id: number, updateClassroomDto: UpdateClassroomDto) {
     try {
       const classRoom = await this.classroomsRepository.findOne(id);
@@ -113,15 +111,17 @@ export class ClassroomsService {
       throw new BadRequestException(err.message);
     }
   }
-  
-  async inviteUser(sendInviteEmailDto: SendInviterEmailDto, userId: number, classroomId: number) {
+
+  async inviteUser(
+    sendInviteEmailDto: SendInviterEmailDto,
+    userId: number,
+    classroomId: number,
+  ) {
     const { email, role } = sendInviteEmailDto;
     const classroom = await this.findOne(classroomId);
-    const classUrl = `${process.env.WEBBASE_URL}/classrooms/${Buffer.from(
-      classroom.code,
-    ).toString('base64')}?role=${
-      role == UserRole.STUDENT ? 'student' : 'teacher'
-    }`;
+    const classUrl = `${process.env.WEBBASE_URL}/classrooms/${
+      classroom.code
+    }?role=${role == UserRole.STUDENT ? 'student' : 'teacher'}`;
     const currentUser = await this.usersService.findById(userId);
     return this.mailService.sendMailInvitation(
       `${currentUser.firstName} ${currentUser.lastName}`,

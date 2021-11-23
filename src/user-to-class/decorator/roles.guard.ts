@@ -22,6 +22,12 @@ export class RolesGuard implements CanActivate {
     }
     const { user } = context.switchToHttp().getRequest();
     const { id } = context.switchToHttp().getRequest().params;
+    const classroom = await this.classroomsService.findOne(id);
+    if (
+      requiredRoles.includes(UserRole.TEACHER) &&
+      classroom.created_by.id == user.id
+    )
+      return true;
     const userToClasses = await this.userToClassService.findAllByRoles(
       id,
       requiredRoles,

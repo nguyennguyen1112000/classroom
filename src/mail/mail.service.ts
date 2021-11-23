@@ -1,7 +1,5 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
-import { ClassroomsService } from 'src/classrooms/classrooms.service';
-import { SendInviterEmailDto } from 'src/classrooms/dto/send-invite-email.dto';
 
 @Injectable()
 export class MailService {
@@ -13,7 +11,8 @@ export class MailService {
     classroomName: String,
     classUrl: String,
     role,
-  ) {
+  ) {    
+    
     const sendMail = await this.mailerService.sendMail({
       from: 'onl.class123@gmail.com',
       to: toUser,

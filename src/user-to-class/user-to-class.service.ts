@@ -37,7 +37,7 @@ export class UserToClassService {
   async findAllByRoles(classroomId: number, roles: UserRole[]) {
     const userToClasses = await this.userToClassRepository.find({
       where: { classroomId: classroomId },
-    });      
+    });
     return userToClasses.filter((userClass) => roles.includes(userClass.role));
   }
 
@@ -59,5 +59,22 @@ export class UserToClassService {
   }
   remove(id: number) {
     return `This action removes a #${id} userToClass`;
+  }
+
+  async findAllByUser(userId: number) {
+    const userToClasses = await this.userToClassRepository.find({
+      relations: ['classroom'],
+      where: { userId },
+    });    
+    return userToClasses.map((userToClass) => {
+      return {
+        id: userToClass.classroom.id,
+        name: userToClass.classroom.name,
+        topic: userToClass.classroom.topic,
+        description: userToClass.classroom.description,
+        code: userToClass.classroom.code,
+        created_at: userToClass.classroom.created_at,
+      };
+    });
   }
 }

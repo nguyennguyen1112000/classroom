@@ -39,7 +39,7 @@ export class ClassroomsController {
     @Param('id') id: number,
     @Body() sendInviteEmailDto: SendInviterEmailDto,
     @GetUser() user: User,
-  ) {
+  ) {    
     await this.classroomsService.inviteUser(sendInviteEmailDto, user.id, id);
   }
 
@@ -54,7 +54,6 @@ export class ClassroomsController {
     return this.classroomsService.findOne(id);
   }
   @Get('/code/:id')
-  @Roles(UserRole.TEACHER, UserRole.STUDENT)
   findByCode(@Param('id') id: string) {
     return this.classroomsService.findByCode(id);
   }
