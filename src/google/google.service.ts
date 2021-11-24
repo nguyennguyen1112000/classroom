@@ -1,6 +1,5 @@
 import {
   Injectable,
-  BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
@@ -29,8 +28,8 @@ export class GoogleService {
       newUser.lastName = lastName;
       newUser.email = email;
       newUser.googleId = googleId;
-      await this.usersService.create(newUser);
-      return this.authService.login(newUser);
+      const user = await this.usersService.create(newUser);
+      return this.authService.login(user);
     } catch (e) {
       throw new Error(e.message);
     }

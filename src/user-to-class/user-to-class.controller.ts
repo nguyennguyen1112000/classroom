@@ -15,7 +15,6 @@ import { UpdateUserToClassDto } from './dto/update-user-to-class.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UserRole } from 'src/users/decorator/user.enum';
-import { Roles } from './decorator/roles.decorator';
 import { GetUser } from 'src/users/decorator/user.decorator';
 import { User } from 'src/users/entities/user.entity';
 
