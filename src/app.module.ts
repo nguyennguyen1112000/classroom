@@ -7,6 +7,7 @@ import { GoogleModule } from './google/google.module';
 import { UserToClassModule } from './user-to-class/user-to-class.module';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
+import { PointStructureModule } from './point-structure/point-structure.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,6 +19,7 @@ import { ConfigModule } from '@nestjs/config';
     GoogleModule,
     UserToClassModule,
     MailModule,
+    PointStructureModule,
   ],
   controllers: [AppController],
   providers: [],

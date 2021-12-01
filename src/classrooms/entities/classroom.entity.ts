@@ -1,3 +1,4 @@
+import { PointStructure } from 'src/point-structure/entities/point-structure.entity';
 import { UserToClass } from 'src/user-to-class/entities/user-to-class.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -42,9 +43,12 @@ export class Classroom {
   })
   public updated_at: Date;
 
-  @OneToMany(
-    (type) => UserToClass,
-    (userToClass) => userToClass.classroom,
-  )
+  @OneToMany((type) => UserToClass, (userToClass) => userToClass.classroom)
   public userToClasses: UserToClass[];
+
+  @OneToMany(
+    (type) => PointStructure,
+    (pointStructure) => pointStructure.classroom,
+  ) 
+  pointStructures: PointStructure[];
 }

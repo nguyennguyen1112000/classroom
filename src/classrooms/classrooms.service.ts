@@ -50,7 +50,12 @@ export class ClassroomsService {
   async findOne(id: number) {
     try {
       const classroom = await this.classroomsRepository.findOne({
-        relations: ['created_by', 'userToClasses', 'userToClasses.user'],
+        relations: [
+          'created_by',
+          'userToClasses',
+          'userToClasses.user',
+          'pointStructures',
+        ],
         where: { id: id },
       });
       const users = await classroom.userToClasses.map((obj) => ({
@@ -69,7 +74,12 @@ export class ClassroomsService {
   async findByCode(code: string) {
     try {
       const classroom = await this.classroomsRepository.findOne({
-        relations: ['created_by', 'userToClasses', 'userToClasses.user'],
+        relations: [
+          'created_by',
+          'userToClasses',
+          'userToClasses.user',
+          'pointStructures',
+        ],
         where: { code: code },
       });
       if (!classroom) throw new NotFoundException();
@@ -80,8 +90,17 @@ export class ClassroomsService {
       }));
       const teachers = users.filter((user) => user.role == 'teacher');
       const students = users.filter((user) => user.role == 'student');
+      const pointStructures = [
+        ...classroom.pointStructures.sort((a, b) => a.order - b.order),
+      ];
 
-      return { ...classroom, teachers, students, userToClasses: undefined };
+      return {
+        ...classroom,
+        teachers,
+        students,
+        userToClasses: undefined,
+        pointStructures,
+      };
     } catch (err) {
       throw new BadRequestException(err.message);
     }
