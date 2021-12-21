@@ -12,4 +12,7 @@ export class GoogleAuthDto {
 
   @ApiProperty()
   lastName: string;
+
+  @ApiProperty({required:false, nullable:true})
+  imageUrl: string;
 }

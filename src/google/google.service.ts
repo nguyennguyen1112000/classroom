@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -14,7 +11,7 @@ export class GoogleService {
     private authService: AuthService,
   ) {}
   async googleLogin(googleAuthDto: GoogleAuthDto) {
-    const {googleId, email, firstName, lastName} = googleAuthDto;
+    const { googleId, email, firstName, lastName, imageUrl } = googleAuthDto;
     let user = await this.usersService.findByGoogleId(googleId);
     if (user) return this.authService.login(user);
     user = await this.usersService.findOne(email);
@@ -28,6 +25,7 @@ export class GoogleService {
       newUser.lastName = lastName;
       newUser.email = email;
       newUser.googleId = googleId;
+      newUser.imageUrl = imageUrl;
       const user = await this.usersService.create(newUser);
       return this.authService.login(user);
     } catch (e) {

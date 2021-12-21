@@ -15,6 +15,8 @@ import { UpdateClassroomDto } from './dto/update-classroom.dto';
 import { Classroom } from './entities/classroom.entity';
 import * as fs from 'fs';
 import { FileType } from 'src/file/decorator/file.enum';
+import { UserToClass } from 'src/user-to-class/entities/user-to-class.entity';
+import { CreateUserToClassDto } from 'src/user-to-class/dto/create-user-to-class.dto';
 @Injectable()
 export class ClassroomsService {
   constructor(
@@ -34,7 +36,13 @@ export class ClassroomsService {
       classroom.description = description;
       classroom.code = (Math.random() + 1).toString(36).substring(7);
       classroom.created_by = created_by;
-      return await this.classroomsRepository.save(classroom);
+      await this.classroomsRepository.save(classroom);
+      let createUserToClassDto = new CreateUserToClassDto();
+      createUserToClassDto.classroomId = classroom.id;
+      createUserToClassDto.role = UserRole.TEACHER;
+      createUserToClassDto.userId = user.id;
+      await this.userToClassService.create(createUserToClassDto);
+      return classroom;
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -57,7 +65,8 @@ export class ClassroomsService {
         ],
         where: { id: id },
       });
-      if (!classroom) throw new NotFoundException(`Classroom not found. Id = ${id}`);
+      if (!classroom)
+        throw new NotFoundException(`Classroom not found. Id = ${id}`);
       const users = await classroom.userToClasses.map((obj) => ({
         role: obj.role,
         user: obj.user,

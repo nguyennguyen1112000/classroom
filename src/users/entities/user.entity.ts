@@ -44,6 +44,9 @@ export class User {
   @Column({ nullable: true })
   studentId: string;
 
+  @Column({ nullable: true })
+  imageUrl: string;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
@@ -55,5 +58,4 @@ export class User {
 
   @OneToMany((type) => UserToClass, (userToClass) => userToClass.user)
   userToClasses: UserToClass[];
-
 }

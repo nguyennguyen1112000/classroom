@@ -168,7 +168,7 @@ export class FileService {
             });
           });
           obj['detailPoints'].sort((x, y) => x.order - y.order);
-          obj['finalPoint'] = finalPoint / totalPoint;
+          obj['finalPoint'] = (finalPoint / totalPoint).toFixed(2);
         });
       }
 

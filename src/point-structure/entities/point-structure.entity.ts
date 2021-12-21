@@ -23,10 +23,10 @@ export class PointStructure {
   @Column()
   order: number;
 
-  @Column({ default: false})
+  @Column({ default: false })
   isPublic: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   markFile: string;
 
   @ManyToOne((type) => Classroom, (classroom) => classroom.pointStructures)

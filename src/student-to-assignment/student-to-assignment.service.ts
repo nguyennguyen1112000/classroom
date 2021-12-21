@@ -35,6 +35,15 @@ export class StudentToAssignmentService {
     }
   }
 
+  async updateMany(
+    classroomId: number,
+    createUserToAssignmentsDto: CreateStudentToAssignmentDto[],
+  ) {
+    for (let i = 0; i < createUserToAssignmentsDto.length; i++) {
+      await this.update(classroomId, createUserToAssignmentsDto[i]);
+    }
+  }
+
   async findByClassroomId(id: number) {
     const studentToAssignment = await this.userToAssignmentRepository.find({
       where: { classroomId: id },
@@ -78,7 +87,7 @@ export class StudentToAssignmentService {
       maxPoint: null,
       detailPoint: finalPoint,
       isPublic: true,
-    });    
+    });
     return response;
   }
 

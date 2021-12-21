@@ -16,7 +16,7 @@ import { UsersService } from 'src/users/users.service';
 export class StudentToAssignmentController {
   constructor(
     private readonly studentToAssignmentService: StudentToAssignmentService,
-    private readonly userService: UsersService
+    private readonly userService: UsersService,
   ) {}
 
   @Post(':id')
@@ -31,6 +31,17 @@ export class StudentToAssignmentController {
     );
   }
 
+  @Post('many/:id')
+  @Roles(UserRole.TEACHER)
+  updateMany(
+    @Param('id') classroomId: number,
+    @Body() createStudentToAssignmentsDto: CreateStudentToAssignmentDto[],
+  ) {
+    return this.studentToAssignmentService.updateMany(
+      classroomId,
+      createStudentToAssignmentsDto,
+    );
+  }
   @Get(':id')
   @Roles(UserRole.TEACHER)
   findAllByClassroom(@Param('id') classroomId: number) {
@@ -41,8 +52,10 @@ export class StudentToAssignmentController {
   @Roles(UserRole.STUDENT)
   async findAll(@GetUser() user: User, @Param('id') classroomId: number) {
     const currentUser = await this.userService.findOne(user.email);
-    if(currentUser)
-    
-    return this.studentToAssignmentService.getAll(currentUser.studentId, classroomId);
+    if (currentUser)
+      return this.studentToAssignmentService.getAll(
+        currentUser.studentId,
+        classroomId,
+      );
   }
 }

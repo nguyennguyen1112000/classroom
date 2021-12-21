@@ -17,7 +17,8 @@ export class UsersService {
   ) {}
   async create(createUserDto: CreateUserDto) {
     try {
-      const { email, firstName, lastName, password, googleId } = createUserDto;
+      const { email, firstName, lastName, password, googleId, imageUrl } =
+        createUserDto;
       const account = await this.usersRepository.findOne({
         where: { email: email },
       });
@@ -36,6 +37,7 @@ export class UsersService {
       user.email = email;
       user.firstName = firstName;
       user.lastName = lastName;
+      if (imageUrl) user.imageUrl = imageUrl;
       return await this.usersRepository.save(user);
     } catch (err) {
       throw new BadRequestException(err.message);
