@@ -1,4 +1,5 @@
 import { Classroom } from 'src/classrooms/entities/classroom.entity';
+import { StudentToAssignment } from 'src/student-to-assignment/entities/student-to-assignment.entity';
 import { UserToClass } from 'src/user-to-class/entities/user-to-class.entity';
 import {
   Entity,
@@ -40,6 +41,9 @@ export class User {
   // @Column({ type: 'enum', enum: UserRole, default: UserRole.STUDENT })
   // role: UserRole;
 
+  @Column({ nullable: true })
+  studentId: string;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
@@ -51,4 +55,5 @@ export class User {
 
   @OneToMany((type) => UserToClass, (userToClass) => userToClass.user)
   userToClasses: UserToClass[];
+
 }

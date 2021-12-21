@@ -8,6 +8,8 @@ import { UserToClassModule } from './user-to-class/user-to-class.module';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
 import { PointStructureModule } from './point-structure/point-structure.module';
+import { FileModule } from './file/file.module';
+import { StudentToAssignmentModule } from './student-to-assignment/student-to-assignment.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,6 +22,8 @@ import { PointStructureModule } from './point-structure/point-structure.module';
     UserToClassModule,
     MailModule,
     PointStructureModule,
+    FileModule,
+    StudentToAssignmentModule,
   ],
   controllers: [AppController],
   providers: [],

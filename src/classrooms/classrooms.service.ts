@@ -1,7 +1,5 @@
 import {
   BadRequestException,
-  forwardRef,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -15,7 +13,8 @@ import { CreateClassroomDto } from './dto/create-classroom.dto';
 import { SendInviterEmailDto } from './dto/send-invite-email.dto';
 import { UpdateClassroomDto } from './dto/update-classroom.dto';
 import { Classroom } from './entities/classroom.entity';
-
+import * as fs from 'fs';
+import { FileType } from 'src/file/decorator/file.enum';
 @Injectable()
 export class ClassroomsService {
   constructor(
@@ -58,6 +57,7 @@ export class ClassroomsService {
         ],
         where: { id: id },
       });
+      if (!classroom) throw new NotFoundException(`Classroom not found. Id = ${id}`);
       const users = await classroom.userToClasses.map((obj) => ({
         role: obj.role,
         user: obj.user,
@@ -86,7 +86,7 @@ export class ClassroomsService {
       const users = await classroom.userToClasses.map((obj) => ({
         role: obj.role,
         user: obj.user,
-        studentId: obj.studentId,
+        studentId: obj.user.studentId,
       }));
       const teachers = users.filter((user) => user.role == 'teacher');
       const students = users.filter((user) => user.role == 'student');
@@ -149,5 +149,50 @@ export class ClassroomsService {
       classUrl,
       role == UserRole.STUDENT ? 'sinh viên' : 'giảng viên',
     );
+  }
+
+  async updateStudentsFile(id: number, fileName: string) {
+    try {
+      const classRoom = await this.classroomsRepository.findOne(id);
+      if (!classRoom)
+        throw new NotFoundException(`Classroom not found. Id = ${id}`);
+      if (classRoom.studentsFile)
+        fs.unlinkSync(`./public/files/${classRoom.studentsFile}`);
+      classRoom.studentsFile = fileName;
+      await this.classroomsRepository.save(classRoom);
+      return true;
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+  async deleteFile(id: number, type: FileType) {
+    try {
+      const classRoom = await this.classroomsRepository.findOne(id);
+      if (!classRoom)
+        throw new NotFoundException(`Classroom not found. Id = ${id}`);
+      if (type == FileType.STUDENT_LIST) {
+        fs.unlinkSync(`./public/files/${classRoom.studentsFile}`);
+        classRoom.studentsFile = null;
+      } else if (type == FileType.MARK) {
+        fs.unlinkSync(`./public/files/${classRoom.markFile}`);
+        classRoom.markFile = null;
+      }
+      await this.classroomsRepository.save(classRoom);
+      return true;
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
+  async getPointStructure(id: number) {
+    try {
+      const classroom = await this.classroomsRepository.findOne({
+        relations: ['pointStructures'],
+        where: { id: id },
+      });
+      return classroom.pointStructures;
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
 }

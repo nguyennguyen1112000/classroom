@@ -7,4 +7,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty()
   birthday: Date;
+
+  @ApiProperty({required:false, nullable:true})
+  studentId: string;
 }

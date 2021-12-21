@@ -12,5 +12,6 @@ import { ClassroomsModule } from 'src/classrooms/classrooms.module';
   ],
   controllers: [PointStructureController],
   providers: [PointStructureService],
+  exports: [PointStructureService]
 })
 export class PointStructureModule {}

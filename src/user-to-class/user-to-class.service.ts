@@ -1,8 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ClassroomsService } from 'src/classrooms/classrooms.service';
 import { UserRole } from 'src/users/decorator/user.enum';
-import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { CreateUserToClassDto } from './dto/create-user-to-class.dto';
 import { UpdateUserToClassDto } from './dto/update-user-to-class.dto';
@@ -48,15 +46,7 @@ export class UserToClassService {
   update(id: number, updateUserToClassDto: UpdateUserToClassDto) {
     return `This action updates a #${id} userToClass`;
   }
-  async mapStudentId(updateUserToClassDto: UpdateUserToClassDto) {
-    const { userId, classroomId, studentId } = updateUserToClassDto;
-    const userToClasses = await this.userToClassRepository.findOne({
-      where: { userId, classroomId },
-    });
-    if (!userToClasses) throw new NotFoundException();
-    userToClasses.studentId = studentId;
-    return await this.userToClassRepository.save(userToClasses);
-  }
+
   remove(id: number) {
     return `This action removes a #${id} userToClass`;
   }

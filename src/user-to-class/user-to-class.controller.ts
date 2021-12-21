@@ -54,10 +54,6 @@ export class UserToClassController {
   ) {
     return this.userToClassService.update(+id, updateUserToClassDto);
   }
-  @Put('mapStudentId')
-  mapStudentId(@Body() updateUserToClassDto: UpdateUserToClassDto) {
-    return this.userToClassService.mapStudentId(updateUserToClassDto);
-  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

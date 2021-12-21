@@ -28,6 +28,12 @@ export class Classroom {
   @Column()
   code: string;
 
+  @Column({nullable:true})
+  studentsFile: string;
+
+  @Column({nullable:true})
+  markFile: string;
+
   @ManyToOne(() => User, (user) => user.classrooms)
   created_by: User;
 
@@ -49,6 +55,6 @@ export class Classroom {
   @OneToMany(
     (type) => PointStructure,
     (pointStructure) => pointStructure.classroom,
-  ) 
+  )
   pointStructures: PointStructure[];
 }

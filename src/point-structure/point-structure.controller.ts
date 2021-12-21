@@ -1,9 +1,19 @@
-import { Controller,  Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Get,
+} from '@nestjs/common';
 import { PointStructureService } from './point-structure.service';
 import { CreatePointStructureDto } from './dto/create-point-structure.dto';
 import { UpdatePointStructureDto } from './dto/update-point-structure.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+
 
 @ApiTags('point-structure')
 @UseGuards(JwtAuthGuard)
@@ -28,5 +38,13 @@ export class PointStructureController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.pointStructureService.remove(+id);
+  }
+
+  @Patch('status/:id')
+  updateStatus(
+    @Param('id') id: number,
+    @Body("status") status: boolean,
+  ) {
+    return this.pointStructureService.updateStatus(id, status);
   }
 }

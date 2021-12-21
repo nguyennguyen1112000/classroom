@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -13,8 +17,7 @@ export class UsersService {
   ) {}
   async create(createUserDto: CreateUserDto) {
     try {
-      const { email, firstName, lastName, password, googleId } =
-        createUserDto;
+      const { email, firstName, lastName, password, googleId } = createUserDto;
       const account = await this.usersRepository.findOne({
         where: { email: email },
       });
@@ -22,7 +25,7 @@ export class UsersService {
         throw new BadRequestException('Tài khoản email đã được sử dụng');
       let user = new User();
 
-      if (password) {     
+      if (password) {
         const saltOrRounds = 10;
         const hash = await bcrypt.hash(password, saltOrRounds);
         user.password = hash;
@@ -49,17 +52,21 @@ export class UsersService {
   async findById(id: number) {
     return await this.usersRepository.findOne(id);
   }
+  async findByStudentId(id: number) {
+    return await this.usersRepository.findOne({ where: { studentId: id } });
+  }
   async findByGoogleId(id: string) {
     return await this.usersRepository.findOne({ where: { googleId: id } });
   }
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.findById(id);
-    if(!user) throw new NotFoundException(`User not found. Id = ${id}`);
-    const {firstName, lastName, sex, birthday} = updateUserDto;
+    if (!user) throw new NotFoundException(`User not found. Id = ${id}`);
+    const { firstName, lastName, sex, birthday, studentId } = updateUserDto;
     user.firstName = firstName;
     user.lastName = lastName;
     user.birthday = birthday;
     user.sex = sex;
+    if (studentId) user.studentId = studentId;
     return await this.usersRepository.save(user);
   }
 
